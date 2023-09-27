@@ -1,0 +1,4 @@
+# virtual environment
+.venv
+# __pycache__ or other dunder folders
+__*__
