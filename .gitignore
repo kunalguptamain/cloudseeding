@@ -1,6 +1,7 @@
 # virtual environment
 .venv
 .DS_Store
+.vscode
 # __pycache__ or other dunder folders
 __*__
 
