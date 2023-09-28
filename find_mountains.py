@@ -1,6 +1,10 @@
 import requests
 import json
 
+URL_OPEN_ELEVATION = "https://api.open-elevation.com/api/v1/lookup"
+URL_GOOGLE_ELEVATION = "https://maps.googleapis.com/maps/api/elevation/json"
+URL_GOOGLE_PLACE = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
+
 class Mountain:
     def __init__(self, name, coords, max_elevation):
         self.name = name
@@ -34,8 +38,7 @@ class MountainInfo:
 
 #helper function to find highest elevation within 1km square around coords
 def highest_elevation(coords, step, key):
-    lat = coords[0]
-    long = coords[1]
+    lat, long = coords
     coords_list = []
     coords_list_google = []
 
@@ -51,21 +54,17 @@ def highest_elevation(coords, step, key):
     
     coords_string_google = '|'.join(str(elem) for elem in coords_list_google)
 
-    URL = "https://api.open-elevation.com/api/v1/lookup"
-    URL_GOOGLE = "https://maps.googleapis.com/maps/api/elevation/json"
     HEADERS = {"Accept" : "application/json", "Content-Type" : "application/json"}
     PARAMS = {'locations': coords_list}
     PARAMS_GOOGLE = {'locations': coords_string_google, 'key' : key}
 
-    response = requests.post(url=URL, headers=HEADERS, json=PARAMS)
-    #response = requests.post(url=URL_GOOGLE, params=PARAMS_GOOGLE)
-    try:
-        data = response.json()
-    except:
-        print("Failed to get response from Elevation API")
-        print("response code ", response)
-        exit(0)
+    response = requests.post(url=URL_OPEN_ELEVATION, headers=HEADERS, json=PARAMS)
+    #response = requests.post(url=URL_GOOGLE_ELEVATION, params=PARAMS_GOOGLE)
 
+    if response.status_code != 200:
+        response.raise_for_status()
+        
+    data = response.json()
     point_list = data['results']
     elevation = 0
     for point in point_list:
@@ -75,27 +74,25 @@ def highest_elevation(coords, step, key):
     return elevation
 
 #finds searches for 20 nearby mountains, returns MountainInfo object
-def find_mountains(lat, long, radius, key):
-    URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
+def find_mountains(coords, radius, key):
+    lat, long = coords
     PARAMS = {'location' : str(lat) + "," + str(long), 'radius' : str(radius), 'keyword' : "mountain|mount|mt", 'type' : 'natural_feature', 'key' : key}
     
-    response = requests.get(url=URL, params=PARAMS)
-    try:
-        data = response.json()
-    except:
-        print("Failed to get response from Google Place API")
-        print("response code ", response)
-        exit(0)
+    response = requests.get(url=URL_GOOGLE_PLACE, params=PARAMS)
+
+    if response.status_code != 200:
+        response.raise_for_status()
     
+    data = response.json()
     places = data['results']
     mountain_info = MountainInfo(lat, long, data)
-    basepoint = Mountain("BASEPOINT", (lat, long), highest_elevation((lat,long), 5, key))
+    basepoint = Mountain("BASEPOINT", (lat, long), highest_elevation(coords, 5, key))
     for place in places:
         name = place['name']
         location = place['geometry']['location']
-        coords = (location['lat'], location['lng'])
-        elevation = highest_elevation(coords, 5, key)
-        new_mountain = Mountain(name, coords, elevation)
+        place_coords = (location['lat'], location['lng'])
+        elevation = highest_elevation(place_coords, 5, key)
+        new_mountain = Mountain(name, place_coords, elevation)
         mountain_info.add_entry(new_mountain)
     
     return mountain_info
