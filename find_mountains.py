@@ -100,6 +100,3 @@ def find_mountains(lat, long, radius, key):
     
     return mountain_info
 
-out = find_mountains(44.276884, -71.304156, 25000, "AIzaSyCDZkpWM43ZWy0bJOxOL15JBQRJwBt7tNQ")
-print(out)
-print(out.highest)
