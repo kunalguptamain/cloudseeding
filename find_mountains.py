@@ -16,9 +16,9 @@ class Mountain:
         return output
 
 class MountainInfo:
-    def __init__(self, lat, long, json_data):
+    def __init__(self, lat, lng, json_data):
         self.lat = lat
-        self.long = long
+        self.lng = lng
         self.json_data = json_data
         self.mountain_list = []
         self.highest = None
@@ -38,7 +38,7 @@ class MountainInfo:
 
 #helper function to find highest elevation within 1km square around coords
 def highest_elevation(coords, step, key):
-    lat, long = coords
+    lat, lng = coords
     coords_list = []
     coords_list_google = []
 
@@ -46,10 +46,10 @@ def highest_elevation(coords, step, key):
         for step_long in range(step * -1, step + 1):
             coords_list.append({
                             "latitude": lat + (step_lat * 0.001), 
-                            "longitude": long + (step_long * 0.001)
+                            "longitude": lng + (step_long * 0.001)
                         })
             coords_list_google.append(
-                            str(lat + (step_lat * 0.001)) + "," + str(long + (step_long * 0.001))
+                            str(lat + (step_lat * 0.001)) + "," + str(lng + (step_long * 0.001))
             )
     
     coords_string_google = '|'.join(str(elem) for elem in coords_list_google)
@@ -75,8 +75,8 @@ def highest_elevation(coords, step, key):
 
 #finds searches for 20 nearby mountains, returns MountainInfo object
 def find_mountains(coords, radius, key):
-    lat, long = coords
-    PARAMS = {'location' : str(lat) + "," + str(long), 'radius' : str(radius), 'keyword' : "mountain|mount|mt", 'type' : 'natural_feature', 'key' : key}
+    lat, lng = coords
+    PARAMS = {'location' : str(lat) + "," + str(lng), 'radius' : str(radius), 'keyword' : "mountain|mount|mt", 'type' : 'natural_feature', 'key' : key}
     
     response = requests.get(url=URL_GOOGLE_PLACE, params=PARAMS)
 
@@ -85,8 +85,8 @@ def find_mountains(coords, radius, key):
     
     data = response.json()
     places = data['results']
-    mountain_info = MountainInfo(lat, long, data)
-    basepoint = Mountain("BASEPOINT", (lat, long), highest_elevation(coords, 5, key))
+    mountain_info = MountainInfo(lat, lng, data)
+    basepoint = Mountain("BASEPOINT", (lat, lng), highest_elevation(coords, 5, key))
     for place in places:
         name = place['name']
         location = place['geometry']['location']

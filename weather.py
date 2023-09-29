@@ -1,5 +1,6 @@
 import requests
-import pandas
+import pandas as pd
+import numpy as np
 from datetime import datetime, timedelta
 import json
 
@@ -65,7 +66,7 @@ def bucket(data, constraints):
     
     return buckets
 
-def save_monthly_weather(location, year, month):
+def monthly_weather(location, year, month):
     """
     location: a tuple containing the latitude and longitude.
     year: a string representing the year, "2023".
@@ -123,17 +124,20 @@ def save_monthly_weather(location, year, month):
 
     return data_processed
 
-    return data
-
-    while current_date < end_date:
-        date_str = current_date.strftime("%Y-%m-%d")
-        #weather_data[date_str] = get_weather(location)
-        current_date += timedelta(days=1)
+    # while current_date < end_date:
+    #     date_str = current_date.strftime("%Y-%m-%d")
+    #     #weather_data[date_str] = get_weather(location)
+    #     current_date += timedelta(days=1)
     
-    # Save the weather data to a file
-    with open(f"{year}_{month}_weather_data.json", 'w') as file:
-        json.dump(weather_data, file)
+    # # Save the weather data to a file
+    # with open(f"{year}_{month}_weather_data.json", 'w') as file:
+    #     json.dump(weather_data, file)
 
+def tenure_weather(arr):
+    name, state, lat, lng, validity = arr
+    lng *= -1
 
-temp = save_monthly_weather((40.722651, -115.587235), "2022", "06")
+    
+
+temp = monthly_weather((40.722651, -115.587235), "2022", "06")
 print(temp)
