@@ -36,17 +36,6 @@ class NumpyArrayEncoder(JSONEncoder):
 app = Flask(__name__)
 CORS(app)
 
-# home page
-@app.get('/')
-def index_get():
-   return render_template('index.html', name=None)
-
-# submit information from home page
-@app.post('/submit')
-def submit():
-   name = request.form.get('name')
-   return render_template('index.html', name=name)
-
 @app.route('/process_input', methods=['POST'])
 def process_input():
     input_data = request.json.get('input_data')
