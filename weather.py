@@ -107,11 +107,10 @@ def monthly_weather(location, year, month):
     weather_data = {}
     #print(end_date)
     response = requests.get(url=URL_HISTORICAL, params=PARAMS)
-    if response.status_code == 200:
-        response.raise_for_status()
-    
+    print("Weather request status code:", response.status_code)
     data = response.json()
-    #print(data)
+    # print(data)
+    # print(data['hourly'])
     data_hourly = data['hourly']
     data_daily = data['daily']
     data_processed = {}
@@ -128,8 +127,8 @@ def monthly_weather(location, year, month):
             bucket_list = bucket(data_list, MAX_MIN_VALS[key])
             data_processed[key] = (avg, bucket_list)
 
-    #print(data)
-
+    # print(data)
+    # print (data_processed)
     return data_processed
 
     # while current_date < end_date:
@@ -140,6 +139,45 @@ def monthly_weather(location, year, month):
     # # Save the weather data to a file
     # with open(f"{year}_{month}_weather_data.json", 'w') as file:
     #     json.dump(weather_data, file)
+
+
+def get_weather_for_loc(lat, long):
+    key_names = ['temperature_2m', 
+                'relativehumidity_2m', 
+                'dewpoint_2m', 
+                'surface_pressure',
+                'cloudcover',
+                'cloudcover_low',
+                'cloudcover_mid',
+                'cloudcover_high',
+                'windspeed_10m',
+                'windspeed_100m',
+                'winddirection_100m',
+                'precipitation_sum',
+                'precipitation_hours',
+                'winddirection_10m_dominant']
+    data_dict = {}
+    for key in key_names:
+        data_dict[key+'_avg'] = []
+        data_dict[key+'_25'] = []
+        data_dict[key+'_50'] = []
+        data_dict[key+'_75'] = []
+        data_dict[key+'_100'] = []
+    current_year = datetime.now().year
+    current_month = datetime.now().month - 2
+    month_str = str(current_month + 1)
+    month_str = month_str.zfill(2)
+    year_str = str(current_year)
+    data = monthly_weather((lat, long), year_str, month_str)
+    for key in data:
+        data_dict[key+'_avg'].append(data[key][0])
+        data_dict[key+'_25'].append(data[key][1][0])
+        data_dict[key+'_50'].append(data[key][1][1])
+        data_dict[key+'_75'].append(data[key][1][2])
+        data_dict[key+'_100'].append(data[key][1][3])
+    return data_dict
+
+
 
 def tenure_weather(name, state, lat, lng, months, validity):
     current_year = datetime.now().year

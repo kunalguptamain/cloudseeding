@@ -7,7 +7,8 @@ import openpyxl
 
 
 def store_weather(array):
-    key = input("Input Google API Key: ")
+    # key = input("Input Google API Key: ")
+    key = "AIzaSyCDZkpWM43ZWy0bJOxOL15JBQRJwBt7tNQ"
     dataframe = pd.DataFrame()
     for entry in array:
       name, state, lat, lng, months, validity = entry
@@ -15,13 +16,26 @@ def store_weather(array):
       entry_data = weather.tenure_weather(name, state, lat, lng, months, validity)
       mountain_data = find_mountains.find_mountains((lat, lng), 10000, key)
       highest_mountain = mountain_data.highest
-      entry_data['highest_elevation'] = [highest_mountain.elevation] * len(entry_data['name'])
-      entry_data['highest_elevation_lat'] = [highest_mountain.coords[0]] * len(entry_data['name'])
-      entry_data['highest_elevation_lng'] = [highest_mountain.coords[1]] * len(entry_data['name'])
+      entry_data['highest_elevation'] = [highest_mountain.elevation] * len(entry_data['temperature_2m_avg'])
+      entry_data['highest_elevation_lat'] = [highest_mountain.coords[0]] * len(entry_data['temperature_2m_avg'])
+      entry_data['highest_elevation_lng'] = [highest_mountain.coords[1]] * len(entry_data['temperature_2m_avg'])
       entry_dataframe = pd.DataFrame(entry_data)
       dataframe = pd.concat([dataframe, entry_dataframe], ignore_index=True)
       print("Finished entry")
     dataframe.to_excel('output.xlsx', index=False)
+
+def return_weather(lat, long):
+  # key = input("Input Google API Key: ")
+  key = "AIzaSyCDZkpWM43ZWy0bJOxOL15JBQRJwBt7tNQ"
+  long *= -1
+  entry_data = weather.get_weather_for_loc(lat, long)
+  mountain_data = find_mountains.find_mountains((lat, long), 10000, key)
+  highest_mountain = mountain_data.highest
+  entry_data['highest_elevation'] = [highest_mountain.elevation] * len(entry_data['temperature_2m_avg'])
+  # entry_data['highest_elevation_lat'] = [highest_mountain.coords[0]] * len(entry_data['temperature_2m_avg'])
+  # entry_data['highest_elevation_lng'] = [highest_mountain.coords[1]] * len(entry_data['temperature_2m_avg'])
+  
+  return entry_data
 
 """
 data = [["Royalston", "MA", 42.6776, 72.1879, [0,1,2,3,4,5,6,7,8,9,10,11], False],
@@ -140,6 +154,6 @@ store_weather(data)
 # ["Royalston", "MA", 42.6776, 72.1879, [0,1,2,3,4,5,6,7,8,9,10,11], False],
 # ["Southbridge", "MA", 42.0751, 72.0334, [0,1,2,3,4,5,6,7,8,9,10,11], False]
 # ]
-data = [['Amherst', "VA", 37.5851, 79.0514, [0,1,2,3,4,5,6,7,8,9,10,11], False]]
-store_weather(data)
+# data = [['Amherst', "VA", 37.5851, 79.0514, [0,1,2,3,4,5,6,7,8,9,10,11], False]]
+# store_weather(data)
 

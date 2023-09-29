@@ -5,6 +5,8 @@ import GifDisplay from './GifDisplay.js'; // Adjust the import path as needed
 function HomePage({handlePageChange, setOutput}) {
     const [isLoading, setIsLoading] = useState(false);
     const [location, setLocation] = useState("");
+    const [lat, setLat] = useState("");
+    const [long, setLong] = useState("");
 
     const handleSubmit = async (e) => {
         setIsLoading(true);
@@ -15,7 +17,7 @@ function HomePage({handlePageChange, setOutput}) {
             headers: {
             'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ input_data: location }),
+            body: JSON.stringify({ input_data: [lat, long] }),
         });
         if (response.ok) {
             const data = await response.json();
@@ -43,14 +45,33 @@ function HomePage({handlePageChange, setOutput}) {
             <img src={logo} className="App-logo" alt="logo" />
             <GifDisplay />
             <form className="form" onSubmit={handleSubmit}>
-                <label> Enter a location</label>
+                {/* <label> Enter a location</label>
                 <input className= 'default-input'
                 type="location"
                 placeholder="your location"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 />
+                <br/> */}
+                
+                <label> Enter a latitude</label>
+                <input className= 'default-input'
+                type="location"
+                placeholder="your lat"
+                value={lat}
+                onChange={(e) => setLat(e.target.value)}
+                />
                 <br/>
+
+                <label> Enter a longtitude</label>
+                <input className= 'default-input'
+                type="location"
+                placeholder="your long"
+                value={long}
+                onChange={(e) => setLong(e.target.value)}
+                />
+                <br/>
+
                 <button className="submit-button" type="submit"> Enter </button>
             </form>
             <br/>
