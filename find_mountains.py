@@ -6,13 +6,13 @@ URL_GOOGLE_ELEVATION = "https://maps.googleapis.com/maps/api/elevation/json"
 URL_GOOGLE_PLACE = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
 
 class Mountain:
-    def __init__(self, name, coords, max_elevation):
+    def __init__(self, name, coords, elevation):
         self.name = name
         self.coords = coords
-        self.max_elevation = max_elevation
+        self.elevation = elevation
     
     def __repr__(self):
-        output = self.name + " (" + str(self.coords[0]) + "," + str(self.coords[1]) + ") " + str(self.max_elevation)
+        output = self.name + " (" + str(self.coords[0]) + "," + str(self.coords[1]) + ") " + str(self.elevation)
         return output
 
 class MountainInfo:
@@ -27,11 +27,11 @@ class MountainInfo:
         self.mountain_list.append(entry)
         if self.highest is None:
             self.highest = entry
-        elif entry.max_elevation > self.highest.max_elevation:
+        elif entry.elevation > self.highest.elevation:
             self.highest = entry
 
     def __repr__(self):
-        output = ""
+        output = "Mountains: \n"
         for entry in self.mountain_list:
             output += entry.__repr__() + "\n"
         return output
@@ -58,11 +58,12 @@ def highest_elevation(coords, step, key):
     PARAMS = {'locations': coords_list}
     PARAMS_GOOGLE = {'locations': coords_string_google, 'key' : key}
 
-    response = requests.post(url=URL_OPEN_ELEVATION, headers=HEADERS, json=PARAMS)
-    #response = requests.post(url=URL_GOOGLE_ELEVATION, params=PARAMS_GOOGLE)
+    #response = requests.post(url=URL_OPEN_ELEVATION, headers=HEADERS, json=PARAMS)
+    response = requests.post(url=URL_GOOGLE_ELEVATION, params=PARAMS_GOOGLE)
 
     if response.status_code != 200:
         response.raise_for_status()
+        exit(0)
         
     data = response.json()
     point_list = data['results']
@@ -82,11 +83,13 @@ def find_mountains(coords, radius, key):
 
     if response.status_code != 200:
         response.raise_for_status()
+        exit(0)
     
     data = response.json()
     places = data['results']
     mountain_info = MountainInfo(lat, lng, data)
     basepoint = Mountain("BASEPOINT", (lat, lng), highest_elevation(coords, 5, key))
+    mountain_info.add_entry(basepoint)
     for place in places:
         name = place['name']
         location = place['geometry']['location']

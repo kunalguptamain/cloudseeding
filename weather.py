@@ -1,7 +1,5 @@
 import requests
-import pandas as pd
-import numpy as np
-import openpyxl
+import find_mountains
 from datetime import datetime, timedelta
 import json
 
@@ -11,7 +9,7 @@ URL_HISTORICAL = "https://archive-api.open-meteo.com/v1/archive"
 MAX_MIN_VALS = {'temperature_2m' : (-20, 60), 
                 'relativehumidity_2m' : (0, 100), 
                 'dewpoint_2m' : (-10, 20), 
-                'surface_pressure' : (800, 900),
+                'surface_pressure' : (800, 1100),
                 'cloudcover' : (0,100),
                 'cloudcover_low' : (0,100),
                 'cloudcover_mid' : (0,100),
@@ -19,7 +17,7 @@ MAX_MIN_VALS = {'temperature_2m' : (-20, 60),
                 'windspeed_10m' : (0, 25),
                 'windspeed_100m' : (0, 30),
                 'winddirection_100m' : (0, 360),
-                'precipitation_sum' : (0, 50),
+                'precipitation_sum' : (0, 30),
                 'precipitation_hours' : (0, 18),
                 'winddirection_10m_dominant' : (0, 360)}
 
@@ -143,9 +141,7 @@ def monthly_weather(location, year, month):
     # with open(f"{year}_{month}_weather_data.json", 'w') as file:
     #     json.dump(weather_data, file)
 
-def tenure_weather(arr):
-    name, state, lat, lng, months, validity = arr
-    lng *= -1
+def tenure_weather(name, state, lat, lng, months, validity):
     current_year = datetime.now().year
     key_names = ['temperature_2m', 
                 'relativehumidity_2m', 
@@ -189,19 +185,4 @@ def tenure_weather(arr):
             data_dict['validity'].append(validity)
 
     return data_dict
-                
-def create_excel(data_dict):
-    dataframe = pd.DataFrame(data_dict)
-    dataframe.to_excel('output.xlsx', index=True)
 
-def store_weather(array):
-    dataframe = pd.DataFrame()
-    for entry in array:
-        entry_data = tenure_weather(entry)
-        entry_dataframe = pd.DataFrame(entry_data)
-        dataframe = pd.concat([dataframe, entry_dataframe])
-    dataframe.to_excel('output.xlsx', index=True)
-
-# data = [["Royalston", "MA", 42.6776, 72.1879, [0,1,2,3,4,5,6,7,8,9,10,11], False],
-#  ["Southbridge", "MA", 42.0751, 72.0334, [0,1,2,3,4,5,6,7,8,9,10,11], False]]
-# store_weather(data)
