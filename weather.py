@@ -1,6 +1,7 @@
 import requests
 import pandas as pd
 import numpy as np
+import openpyxl
 from datetime import datetime, timedelta
 import json
 
@@ -18,8 +19,8 @@ MAX_MIN_VALS = {'temperature_2m' : (-20, 60),
                 'windspeed_10m' : (0, 25),
                 'windspeed_100m' : (0, 30),
                 'winddirection_100m' : (0, 360),
-                'precipitation_sum' : (0, 1500),
-                'precipitation_hours' : (0, 24),
+                'precipitation_sum' : (0, 50),
+                'precipitation_hours' : (0, 18),
                 'winddirection_10m_dominant' : (0, 360)}
 
 def get_weather(location):
@@ -51,7 +52,7 @@ def bucket(data, constraints):
     mark_1 = min + bucket_size
     mark_2 = mark_1 + bucket_size
     mark_3 = mark_2 + bucket_size
-    print("min: ", min, " max: ", max, " bucket_size: ", bucket_size, " mark_1: ", mark_1, " mark_2: ", mark_2, " mark_3: ", mark_3)
+    #print("min: ", min, " max: ", max, " bucket_size: ", bucket_size, " mark_1: ", mark_1, " mark_2: ", mark_2, " mark_3: ", mark_3)
     buckets = [0, 0, 0, 0]
 
     for data_point in data:
@@ -72,6 +73,7 @@ def monthly_weather(location, year, month):
     year: a string representing the year, "2023".
     month: a string representing the month, "09".
     """
+
     start_date = datetime.strptime(f"{year}-{month}-01", "%Y-%m-%d")
     # Calculating the last day of the month
     if month == "12":
@@ -105,13 +107,15 @@ def monthly_weather(location, year, month):
              }
 
     weather_data = {}
-
+    #print(end_date)
     response = requests.get(url=URL_HISTORICAL, params=PARAMS)
     if response.status_code == 200:
         response.raise_for_status()
     
     data = response.json()
+    #print(data)
     data_hourly = data['hourly']
+    data_daily = data['daily']
     data_processed = {}
     for key in data_hourly:
         if key != 'time':
@@ -119,8 +123,14 @@ def monthly_weather(location, year, month):
             avg = list_average(data_list)
             bucket_list = bucket(data_list, MAX_MIN_VALS[key])
             data_processed[key] = (avg, bucket_list)
+    for key in data_daily:
+        if key != 'time':
+            data_list = data_daily[key]
+            avg = list_average(data_list)
+            bucket_list = bucket(data_list, MAX_MIN_VALS[key])
+            data_processed[key] = (avg, bucket_list)
 
-    print(data)
+    #print(data)
 
     return data_processed
 
@@ -134,10 +144,64 @@ def monthly_weather(location, year, month):
     #     json.dump(weather_data, file)
 
 def tenure_weather(arr):
-    name, state, lat, lng, validity = arr
+    name, state, lat, lng, months, validity = arr
     lng *= -1
+    current_year = datetime.now().year
+    key_names = ['temperature_2m', 
+                'relativehumidity_2m', 
+                'dewpoint_2m', 
+                'surface_pressure',
+                'cloudcover',
+                'cloudcover_low',
+                'cloudcover_mid',
+                'cloudcover_high',
+                'windspeed_10m',
+                'windspeed_100m',
+                'winddirection_100m',
+                'precipitation_sum',
+                'precipitation_hours',
+                'winddirection_10m_dominant']
+    data_dict = {}
+    for key in key_names:
+        data_dict[key+'_avg'] = []
+        data_dict[key+'_25'] = []
+        data_dict[key+'_50'] = []
+        data_dict[key+'_75'] = []
+        data_dict[key+'_100'] = []
+    data_dict['name'] = []
+    data_dict['state'] = []
+    data_dict['validity'] = []
 
-    
+    for month in months:
+        for year in (current_year - 10, current_year - 1):
+            month_str = str(month + 1)
+            month_str = month_str.zfill(2)
+            year_str = str(year)
+            data = monthly_weather((lat, lng), year_str, month_str)
+            for key in data:
+                data_dict[key+'_avg'].append(data[key][0])
+                data_dict[key+'_25'].append(data[key][1][0])
+                data_dict[key+'_50'].append(data[key][1][1])
+                data_dict[key+'_75'].append(data[key][1][2])
+                data_dict[key+'_100'].append(data[key][1][3])
+            data_dict['name'].append(name)
+            data_dict['state'].append(state)
+            data_dict['validity'].append(validity)
 
-temp = monthly_weather((40.722651, -115.587235), "2022", "06")
-print(temp)
+    return data_dict
+                
+def create_excel(data_dict):
+    dataframe = pd.DataFrame(data_dict)
+    dataframe.to_excel('output.xlsx', index=True)
+
+def store_weather(array):
+    dataframe = pd.DataFrame()
+    for entry in array:
+        entry_data = tenure_weather(entry)
+        entry_dataframe = pd.DataFrame(entry_data)
+        dataframe = pd.concat([dataframe, entry_dataframe])
+    dataframe.to_excel('output.xlsx', index=True)
+
+# data = [["Royalston", "MA", 42.6776, 72.1879, [0,1,2,3,4,5,6,7,8,9,10,11], False],
+#  ["Southbridge", "MA", 42.0751, 72.0334, [0,1,2,3,4,5,6,7,8,9,10,11], False]]
+# store_weather(data)
