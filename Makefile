@@ -9,8 +9,8 @@ run-local: # runs flask locally
 run-public: # makes server publicly available
 	flask run --host=0.0.0.0
 
-dev-env: FORCE
-	pip install -r $(REQ_DIR)/requirements-dev.txt
+dev-env: # creates a virtual environment and installs requirements for development
+	pip install -r $(REQ_DIR)/requirements.txt
 
 # Windows
 # .venv\Scripts\activate
