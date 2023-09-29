@@ -1,11 +1,13 @@
 import React,  { useState} from 'react';
 import HomePage from './pages/HomePage.js';
 import InfoPage from './pages/InfoPage.js';
+import OutputPage from './pages/OutputPage.js';
 import NavBar from './components/navbar';
 import './App.css';
 
 function  App() {
   const [currentPage, setCurrentPage] = useState('home');
+  const [output, setOutput] = useState('');
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -15,8 +17,14 @@ function  App() {
     switch (currentPage) {
       case 'info':
         return <InfoPage/>
+      case 'output':
+        return <OutputPage
+        output={output}
+        />
       default:
-        return <HomePage/>
+        return <HomePage 
+        setOutput={setOutput}
+        handlePageChange={handlePageChange}/>
     }
   }
 

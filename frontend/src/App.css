@@ -4,6 +4,7 @@
 
 .App-logo {
   height: 40vmin;
+  width: 400px;
   pointer-events: none;
 }
 .container {
@@ -16,12 +17,12 @@
   margin-top: -24px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.buttonComponent {
+  position: absolute;
+  top: 375px; /* Adjust the top position as needed */
+  left: 690px; /* Adjust the left position as needed */
+  z-index: 2; /* Set a higher z-index to make this component appear on top */
 }
-
 
 .form {
     display:grid;
@@ -52,13 +53,13 @@
 .App-link {
   color: #975cdf;
   font-family: fantasy;
+  text-decoration: underline;
+  cursor: pointer;         
+  transition: all 0.3s;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.App-link:hover {
+  color: #ff7f50; /* Change the color on hover (you can use your own color) */
+  text-shadow: 0 0 10px #ff7f50; /* Add a text shadow for the "glow" effect */
+  transform: scale(1.1); /* Make it slightly larger on hover for the "pop" effect */
 }
