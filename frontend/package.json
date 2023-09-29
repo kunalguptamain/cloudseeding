@@ -1,5 +1,13 @@
 {
   "name": "frontend",
+  "plugins": [
+    [
+      "@babel/plugin-transform-react-jsx",
+      {
+        "throwIfNamespace": false
+      }
+    ]
+  ],
   "version": "0.1.0",
   "private": true,
   "proxy": "http://localhost:5002/",

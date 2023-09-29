@@ -3,6 +3,7 @@ import HomePage from './pages/HomePage.js';
 import InfoPage from './pages/InfoPage.js';
 import OutputPage from './pages/OutputPage.js';
 import NavBar from './components/navbar';
+import DataTable from './table.js';
 import './App.css';
 
 function  App() {

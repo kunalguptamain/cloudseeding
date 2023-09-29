@@ -44,45 +44,53 @@ function HomePage({handlePageChange, setOutput}) {
             <header className="App-header">
             <img src={logo} className="App-logo" alt="logo" />
             <GifDisplay />
-            <form className="form" onSubmit={handleSubmit}>
-                {/* <label> Enter a location</label>
-                <input className= 'default-input'
-                type="location"
-                placeholder="your location"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                />
-                <br/> */}
-                
-                <label> Enter a latitude</label>
-                <input className= 'default-input'
-                type="location"
-                placeholder="your lat"
-                value={lat}
-                onChange={(e) => setLat(e.target.value)}
-                />
-                <br/>
+            <div className="form-container">
+                <form className="lat-long-form" onSubmit={handleSubmit}>
+                    {/* <label> Enter a location</label>
+                    <input className= 'default-input'
+                    type="location"
+                    placeholder="your location"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    />
+                    <br/> */}
+                    
+                    <label> Enter a latitude: </label>
+                    <input className= 'default-input'
+                    type="location"
+                    value={lat}
+                    onChange={(e) => setLat(e.target.value)}
+                    />
+                    <br/>
 
-                <label> Enter a longtitude</label>
-                <input className= 'default-input'
-                type="location"
-                placeholder="your long"
-                value={long}
-                onChange={(e) => setLong(e.target.value)}
-                />
-                <br/>
+                    <label> Enter a longtitude: </label>
+                    <input className= 'default-input'
+                    type="location"
+                    value={long}
+                    onChange={(e) => setLong(e.target.value)}
+                    />
+                    <br/>
+                    
+                  <button class="submit-button" type="submit">
+                            <span>Enter</span>
+                            <div class="success">
+                            
+                            </div>
+                        </button>
+                </form>
+            </div>
+            <div className="App-link">
+                <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => handlePageChange('info')}
+                >
+                    Learn about cloud seeding!
+                </a>
+            </div>
 
-                <button className="submit-button" type="submit"> Enter </button>
-            </form>
             <br/>
-            <a
-                className="App-link"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => handlePageChange('info')}
-            >
-                Learn about cloud seeding!
-            </a>
+            
             </header>
         </div>
     );

@@ -68,7 +68,7 @@ def process_input():
     # print(aug)
 
     result = getResult(two_dimensional_array)
-    return str(round(result[0][0] * 100, 3))
+    return jsonify([round(result[0][0] * 100, 3), data])
 
 model = tf.keras.models.load_model("./modelsave/")
 model.summary()
